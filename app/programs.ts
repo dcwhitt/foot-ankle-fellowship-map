@@ -10,6 +10,13 @@ export type Program = {
   website?: string;
   positions?: number;
   director?: string;
+  faculty?: string[];
+  focus?: string[];
+  stipend?: string;
+  caseVolume?: string;
+  eligibility?: string;
+  research?: string;
+  call?: string;
 };
 
 const AOFAS = "https://www.aofas.org/education/fellowship-match-program/orthopaedic-foot-and-ankle-fellowship-programs";
@@ -67,3 +74,55 @@ export const programs: Program[] = [
 ];
 
 export const aofasUrl = (program: Program) => `${AOFAS}#${program.anchor}`;
+
+const details: Record<string, Partial<Program>> = {
+  graves: { faculty: ["Jaycen Brown, MD"], focus: ["Trauma"] },
+  alabama: { faculty: ["Michael Johnson, MD"], focus: ["Total ankle replacement", "Arthroscopy", "Forefoot", "Hindfoot", "Reconstruction"] },
+  allegheny: { faculty: ["Matthew Bologna, MD"], focus: ["High-volume private practice"] },
+  asmi: { faculty: ["John Kirchner, MD", "William Krauss, DO"], focus: ["Sports medicine", "Arthroscopy", "Pediatrics", "Biomechanics"], stipend: "$45,000 (amount currently listed by AOFAS; verify with program)", eligibility: "Applicants must graduate from a US ACGME-accredited orthopaedic residency; ECFMG certificate holders are not eligible.", research: "At least one basic-science or clinical project and a publishable manuscript are expected." },
+  baptist: { faculty: ["Christopher Hodgkins, MD", "Thomas San Giovanni, MD"], focus: ["Trauma", "Sports medicine", "Arthroscopy", "Reconstruction"], caseVolume: "More than 600 cases during the fellowship year", research: "Clinical/basic-science participation is encouraged with protected weekly research time." },
+  baylor: { faculty: ["James Brodsky, MD", "Christian Royer, MD", "Veerabhadra Reddy, MD", "David Vier, MD"], focus: ["Trauma", "Reconstruction", "Biomechanics"] },
+  brown: { faculty: ["Mostafa Abousayed, MD, MSc", "Raymond Hsu, MD"], focus: ["Trauma"] },
+  cedars: { faculty: ["Glenn Pfeffer, MD"], focus: ["Trauma", "Sports medicine", "Tendinopathy"] },
+  charleston: { faculty: ["Daniel Scott, MD"], focus: ["Total ankle replacement", "Sports medicine", "Arthroscopy", "Hindfoot", "Reconstruction", "Charcot / limb salvage", "Deformity", "Biomechanics"] },
+  cleveland: { faculty: ["Mark Berkowitz, MD", "Alan Davis, MD", "Stephen Pinney, MD"], focus: ["Total ankle replacement", "Trauma", "Arthroscopy", "Forefoot", "Reconstruction", "Deformity"] },
+  beaumont: { faculty: ["Allan Grant, MD", "Sean Matuszak, MD", "Zachary Vaupel, MD", "Zein El-Zein, MD"], focus: ["Total ankle replacement", "Charcot / limb salvage", "Deformity"] },
+  duke: { faculty: ["Samuel Adams, MD", "Annunziato Amendola, MD", "Cesar de Cesar Netto, MD, PhD", "Andrew Hanselman, MD", "James Nunley, MD", "Karl Schweitzer, MD"], focus: ["Total ankle replacement", "Forefoot", "Hindfoot", "Reconstruction", "Biomechanics"] },
+  emory: { faculty: ["Jason Bariteau, MD", "Michelle Coleman, MD, PhD", "John Louis-Ugbo, MD"], focus: ["Trauma", "Forefoot", "Hindfoot", "Deformity"], research: "Two projects are expected, with submission to the AOFAS Annual Meeting and eventual publication as goals." },
+  grandrapids: { faculty: ["John Maskill, MD"], focus: ["Adult foot & ankle surgery"] },
+  ucla: { faculty: ["Arash Aminian, MD", "David Lee, MD", "Ronald Smith, MD"], focus: ["Adult foot & ankle surgery"] },
+  harvardmgb: { faculty: ["Eric Bluman, MD, PhD", "Christopher Chiodo, MD", "Christopher DiGiovanni, MD", "Amgad Haleem, MD, PhD", "John Kwon, MD", "Christopher Miller, MD", "Gregory Waryasz, MD", "Lorena Bejarano-Pineda, MD", "Daniel Guss, MD, MBA", "Elizabeth Martin, MD"], focus: ["Total ankle replacement", "Trauma", "Minimally invasive", "Deformity", "Biomechanics"] },
+  hss: { faculty: ["Steve Behrens, MD", "Elizabeth Cody, MD", "Jonathan Deland, MD", "Constantine Demetracopoulos, MD", "Andrew Elliott, MD", "Scott Ellis, MD", "Holly Johnson, MD", "David Levine, MD", "Martin O'Malley, MD", "Matthew Roberts, MD"], focus: ["Trauma", "Reconstruction", "Pediatrics", "Deformity"], research: "Two research projects and two manuscripts are expected by the end of the academic year." },
+  wisconsin: { faculty: [], focus: ["Trauma"], eligibility: "Requires completion of an approved US orthopaedic residency and eligibility for a Wisconsin medical license." },
+  medstar: { faculty: ["Gregory Guyton, MD"], focus: ["Total ankle replacement", "Trauma", "Forefoot", "Hindfoot", "Reconstruction", "Biomechanics"] },
+  mercy: { faculty: ["John Campbell, MD", "Clifford Jeng, MD", "Patrick Maloney, MD", "Lew Schon, MD"], focus: ["Trauma", "Reconstruction", "Deformity"] },
+  rush: { faculty: ["Daniel Bohl, MD, MPH", "Johnny Lin, MD", "Edward Hur, MD"], focus: ["Total ankle replacement", "Trauma", "Reconstruction", "Charcot / limb salvage", "Deformity"] },
+  newengland: { faculty: ["Mark Slovenkai, MD"], focus: ["Total ankle replacement", "Arthroscopy", "Forefoot", "Hindfoot", "Reconstruction"], eligibility: "Accepts graduates of US and Canadian residency programs; see the AOFAS listing for the full rule." },
+  northwestern: { faculty: ["Armen Kelikian, MD", "Milap Patel, DO"], focus: ["Total ankle replacement", "Trauma", "Reconstruction", "Biomechanics"] },
+  nyu: { faculty: ["John Kennedy, MD", "Raymond Walls, MD", "Steven Sheskier, MD", "Anny Hsu, MD", "Lew Schon, MD", "Rebekah Belayneh, MD"], focus: ["Total ankle replacement", "Arthroscopy", "Forefoot", "Reconstruction", "Deformity"] },
+  orthoarizona: { faculty: ["David Jaffe, MD", "Parisa Morris, MD", "Jason Patterson, MD"], focus: ["Trauma", "Forefoot", "Hindfoot", "Reconstruction", "Charcot / limb salvage", "Pediatrics"] },
+  orthocarolina: { faculty: ["Bruce Cohen, MD", "Carroll Jones, MD", "Kent Ellington, MD", "Scott Shawen, MD", "Samuel Ford, MD", "Amanda Fletcher, MD", "Robert Anderson, MD"], focus: ["Total ankle replacement", "Trauma", "Sports medicine", "Forefoot", "Reconstruction", "Charcot / limb salvage", "Deformity"] },
+  pennstate: { faculty: ["Umur Aydogan, MD", "Paul Juliano, MD", "Ashlee MacDonald, MD"], focus: ["Total ankle replacement", "Trauma", "Sports medicine", "Reconstruction", "Charcot / limb salvage", "Pediatrics", "Deformity", "Biomechanics"], research: "Research participation and production of a scholarly project are expected." },
+  steadman: { faculty: [], focus: ["Trauma", "Sports medicine", "Arthroscopy", "Forefoot", "Hindfoot", "Reconstruction"] },
+  jefferson: { faculty: ["Joseph Daniel, DO", "Thomas Dowd, MD", "Daniel Fuchs, MD", "Anny Hsu, MD", "Gregory Kirwan, MD", "Joseph O'Neil, MD", "Andre Pagliaro, MD", "Rachel Shakked, MD", "Bret Smith, DO"], focus: ["Total ankle replacement", "Trauma", "Arthroscopy", "Reconstruction", "Charcot / limb salvage", "Deformity"], caseVolume: "More than 600 surgical cases annually, including 100+ ankle arthroplasties/revisions" },
+  twincities: { director: "Jeffrey Seybold, MD", positions: 2, faculty: ["Paul Cammack, MD", "Bryan Den Hartog, MD", "William Engasser, MD"], focus: ["Trauma", "Forefoot", "Hindfoot", "Reconstruction", "Biomechanics"], caseVolume: "More than 550 cases annually", eligibility: "IMG applicants must hold US permanent residency; the program states it cannot sponsor visas." },
+  ucdavis: { positions: 2, faculty: ["Spencer Cassinelli, MD", "Christopher Diefenbach, MD", "Christopher Kreulen, MD", "Scott Whitlow, MD"], focus: ["Adult foot & ankle surgery"] },
+  colorado: { director: "Kenneth Hunt, MD", positions: 2, faculty: ["Courtney Grimsrud, MD", "Joshua Metzl, MD", "Daniel Moon, MD, MS, MBA", "Mark Myerson, MD"], focus: ["Trauma", "Reconstruction"] },
+  uconn: { director: "Lauren E. Geaney, MD", faculty: ["Thomas McDonald, MD", "Raymond Sullivan, MD"], focus: ["Biomechanics"] },
+  iowa: { director: "John Femino, MD", faculty: [], focus: ["Total ankle replacement", "Trauma", "Arthroscopy", "Reconstruction", "Charcot / limb salvage", "Minimally invasive", "Deformity"] },
+  louisville: { director: "Victor Anciano, MD", positions: 1, faculty: ["Todd Hockenbury, DO"], focus: ["Adult foot & ankle surgery"], caseVolume: "More than 500 cases" },
+  upenn: { director: "Bobby Ndu, MD", positions: 2, faculty: ["Lorraine Boakye, MD", "Wen Chao, MD", "Daniel Farber, MD", "Casey Humbyrd, MD, MBE", "L. Scott Levin, MD"], focus: ["Trauma", "Arthroscopy", "Reconstruction", "Deformity", "Biomechanics"], eligibility: "Accepts graduates of US and Canadian residency programs." },
+  pitt: { positions: 3, faculty: ["Stephen Conti, MD", "MaCalus Hogan, MD, MBA", "Christopher Edwards, MD", "Lauren Lewis, MD", "William Saar, DO"], focus: ["Adult foot & ankle surgery"] },
+  rochester: { director: "David J. Ciufo, MD", faculty: ["Benedict DiGiovanni, MD", "A. Samuel Flemister, MD", "John Ketz, MD"], focus: ["Adult foot & ankle surgery"], eligibility: "See the program's linked GME applicant eligibility requirements." },
+  southcarolina: { director: "J. Benjamin Jackson, MD, MBA", faculty: ["Tyler Gonzalez, MD, MBA"], focus: ["Minimally invasive"], research: "The listing describes an active research program with multiple ongoing projects." },
+  campbell: { director: "Clayton Bettin, MD", positions: 2, faculty: ["Benjamin Grear, MD", "Andrew Murphy, MD", "David Richardson, MD", "Carson Rider, MD"], focus: ["Trauma", "Arthroscopy", "Forefoot", "Charcot / limb salvage", "Deformity"], call: "No mandatory call is listed." },
+  texas: { director: "William McGarvey, MD", positions: 2, faculty: ["Oladapo Alade, MD", "Richard Beaver, MD", "David Bloome, MD", "Taggart Gauvain, MD", "Michael Greaser, MD"], focus: ["Trauma", "Sports medicine", "Reconstruction", "Pediatrics"] },
+  toronto: { director: "Johnny Lau, MD, MSc", faculty: ["Mansur Halai, MD", "Sam Park, MD"], focus: ["Total ankle replacement", "Trauma", "Forefoot", "Reconstruction"] },
+  utah: { director: "Devon Nixon, MD", faculty: ["Florian Nickisch, MD", "Megan Campbell, MD"], focus: ["Trauma", "Sports medicine", "Reconstruction", "Minimally invasive", "Deformity"] },
+  virginia: { director: "M. Truitt Cooper, MD", faculty: ["Joseph Park, MD"], focus: ["Total ankle replacement", "Trauma", "Sports medicine", "Arthroscopy", "Reconstruction", "Deformity"] },
+  washington: { director: "David Dalstrom, MD", positions: 3, faculty: ["Stephen Benirschke, MD", "Kenneth Chin, MD", "Bruce Sangeorzan, MD"], focus: ["Trauma", "Sports medicine", "Reconstruction"], research: "The weekly experience includes protected research time and teaching conferences." },
+  utmb: { director: "Vinod Panchbhavi, MD, FACS", faculty: ["Jie Chen, MD, MPH", "William Weiss, MD, MSc"], focus: ["Total ankle replacement", "Reconstruction", "Minimally invasive", "Deformity"] },
+  washu: { director: "Jeremy McCormick, MD", faculty: [], focus: ["Trauma"] },
+};
+
+programs.forEach((program) => Object.assign(program, details[program.anchor] ?? {}));
