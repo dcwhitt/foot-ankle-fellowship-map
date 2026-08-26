@@ -13,6 +13,7 @@ function Map({ items, selected, onSelect }: { items: Program[]; selected?: Progr
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<any>(null);
   const layer = useRef<any>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const load = () => {
@@ -23,6 +24,7 @@ function Map({ items, selected, onSelect }: { items: Program[]; selected?: Progr
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>', maxZoom: 18,
       }).addTo(map.current);
       layer.current = window.L.layerGroup().addTo(map.current);
+      setReady(true);
     };
     if (window.L) load();
     else {
@@ -50,7 +52,7 @@ function Map({ items, selected, onSelect }: { items: Program[]; selected?: Progr
     });
     if (selected) map.current.flyTo([selected.lat, selected.lng], Math.max(map.current.getZoom(), 6), { duration: .6 });
     else if (bounds.length) map.current.fitBounds(bounds, { padding: [38, 38], maxZoom: 5 });
-  }, [items, selected, onSelect]);
+  }, [items, selected, onSelect, ready]);
 
   return <div ref={el} className="map" aria-label="Interactive map of accredited fellowship programs" />;
 }
