@@ -8,6 +8,8 @@ declare global {
 }
 
 const regions = ["All", "Northeast", "South", "Midwest", "West", "Canada"] as const;
+const focusOptions = ["All focuses", ...Array.from(new Set(programs.flatMap(p => p.focus ?? []))).sort()] as const;
+const missing = "Not publicly reported";
 
 function Map({ items, selected, onSelect }: { items: Program[]; selected?: Program; onSelect: (p: Program) => void }) {
   const el = useRef<HTMLDivElement>(null);
@@ -62,13 +64,18 @@ export default function FellowshipExplorer() {
   const [region, setRegion] = useState<(typeof regions)[number]>("All");
   const [selected, setSelected] = useState<Program>();
   const [listOpen, setListOpen] = useState(false);
+  const [focus, setFocus] = useState<string>("All focuses");
+  const [compared, setCompared] = useState<string[]>([]);
+  const [compareOpen, setCompareOpen] = useState(false);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return programs.filter((p) => (region === "All" || p.region === region) && (!q || `${p.name} ${p.city} ${p.state} ${p.code}`.toLowerCase().includes(q)));
-  }, [query, region]);
+    return programs.filter((p) => (region === "All" || p.region === region) && (focus === "All focuses" || p.focus?.includes(focus)) && (!q || `${p.name} ${p.city} ${p.state} ${p.code} ${(p.focus ?? []).join(" ")} ${(p.faculty ?? []).join(" ")}`.toLowerCase().includes(q)));
+  }, [query, region, focus]);
 
   const select = (p: Program) => { setSelected(p); setListOpen(false); };
+  const toggleCompare = (code: string) => setCompared(current => current.includes(code) ? current.filter(c => c !== code) : current.length < 4 ? [...current, code] : current);
+  const comparedPrograms = programs.filter(p => compared.includes(p.code));
 
   return (
     <main>
@@ -89,14 +96,16 @@ export default function FellowshipExplorer() {
         <div className="filters">
           <label className="search"><span>⌕</span><input value={query} onChange={(e) => { setQuery(e.target.value); setSelected(undefined); }} placeholder="Search program, city, state, or SF Match code" aria-label="Search programs" /></label>
           <div className="region-tabs" role="group" aria-label="Filter by region">{regions.map(r => <button key={r} className={region === r ? "active" : ""} onClick={() => { setRegion(r); setSelected(undefined); }}>{r}</button>)}</div>
+          <label className="focus-filter"><span>Clinical focus</span><select value={focus} onChange={e => { setFocus(e.target.value); setSelected(undefined); }}>{focusOptions.map(option => <option key={option}>{option}</option>)}</select></label>
         </div>
         <button className="mobile-list-toggle" onClick={() => setListOpen(v => !v)}>{listOpen ? "Show map" : `Show ${filtered.length} programs`}</button>
         <div className={`workspace ${listOpen ? "list-open" : ""}`}>
           <aside className="program-list" aria-label="Fellowship programs">
             <div className="list-count"><b>{filtered.length}</b> programs</div>
-            {filtered.map((p, i) => <button key={p.code} onClick={() => select(p)} className={selected?.code === p.code ? "selected" : ""}>
-              <span className="index">{String(i + 1).padStart(2, "0")}</span><span className="list-copy"><b>{p.name}</b><small>{p.city}, {p.state} · Code {p.code}</small></span><span className="arrow">↗</span>
-            </button>)}
+            {filtered.map((p, i) => <div key={p.code} className={`program-row ${selected?.code === p.code ? "selected" : ""}`}>
+              <button className="program-select" onClick={() => select(p)}><span className="index">{String(i + 1).padStart(2, "0")}</span><span className="list-copy"><b>{p.name}</b><small>{p.city}, {p.state} · {(p.director ? 1 : 0) + (p.faculty?.length ?? 0)} listed F&amp;A faculty</small></span><span className="arrow">↗</span></button>
+              <button className={`compare-add ${compared.includes(p.code) ? "active" : ""}`} onClick={() => toggleCompare(p.code)} aria-label={`${compared.includes(p.code) ? "Remove" : "Add"} ${p.name} ${compared.includes(p.code) ? "from" : "to"} comparison`}>{compared.includes(p.code) ? "✓" : "+"}</button>
+            </div>)}
             {!filtered.length && <div className="empty">No programs match those filters.</div>}
           </aside>
           <div className="map-wrap">
@@ -110,15 +119,29 @@ export default function FellowshipExplorer() {
               <div className="detail-grid">
                 <div><span>Program director</span><b>{selected.director ?? "See AOFAS listing"}</b></div>
                 <div><span>Positions</span><b>{selected.positions ?? "See listing"}</b></div>
-                <div><span>Region</span><b>{selected.region}</b></div>
+                <div><span>Listed F&amp;A faculty</span><b>{(selected.director ? 1 : 0) + (selected.faculty?.length ?? 0)}</b></div>
               </div>
+              <div className="profile-section"><span>Clinical focus &amp; expertise</span><div className="tags">{(selected.focus?.length ? selected.focus : [missing]).map(x => <i key={x}>{x}</i>)}</div></div>
+              <div className="profile-section"><span>Faculty highlights</span><p><b>{selected.director ?? "Director not listed"}</b>{selected.faculty?.length ? ` · ${selected.faculty.slice(0, 4).join(" · ")}${selected.faculty.length > 4 ? ` · +${selected.faculty.length - 4} more` : ""}` : " · Additional faculty not publicly reported"}</p></div>
+              <div className="detail-grid facts">
+                <div><span>Stipend</span><b>{selected.stipend ?? missing}</b></div>
+                <div><span>Case volume</span><b>{selected.caseVolume ?? missing}</b></div>
+                <div><span>Call</span><b>{selected.call ?? missing}</b></div>
+              </div>
+              {(selected.research || selected.eligibility) && <div className="profile-notes">{selected.research && <p><span>Research</span>{selected.research}</p>}{selected.eligibility && <p><span>Eligibility</span>{selected.eligibility}</p>}</div>}
               <div className="detail-actions"><a className="primary" href={aofasUrl(selected)} target="_blank" rel="noreferrer">View AOFAS profile ↗</a>{selected.website && <a href={selected.website} target="_blank" rel="noreferrer">Program website ↗</a>}</div>
+              <small className="verified">Source: AOFAS directory · reviewed August 2026 · verify directly with program</small>
             </article>}
           </div>
         </div>
+        {compared.length > 0 && <div className="compare-bar"><span><b>{compared.length}</b> selected {compared.length === 4 && <small>Maximum 4</small>}</span><button onClick={() => setCompareOpen(true)}>Compare programs</button><button className="clear" onClick={() => setCompared([])}>Clear</button></div>}
       </section>
 
-      <section className="about" id="about"><span className="section-no">02</span><div><h2>A clearer starting point for fellowship research.</h2><p>This independent directory organizes the AOFAS 2026–2027 accredited program list geographically. Program facts link back to AOFAS and official program websites so applicants can verify details at the source.</p><p className="note">Not affiliated with or endorsed by AOFAS or SF Match. Program information can change; always confirm application details with the program and SF Match.</p></div></section>
+      {compareOpen && <div className="compare-modal" role="dialog" aria-modal="true" aria-label="Compare fellowship programs"><div className="compare-sheet"><button className="compare-close" onClick={() => setCompareOpen(false)} aria-label="Close comparison">×</button><div className="section-no">SIDE-BY-SIDE</div><h2>Compare programs</h2><p className="compare-intro">Publicly available data only. “Not publicly reported” means the source did not provide the detail—not that the benefit or experience is absent.</p><div className="comparison-grid">
+        {comparedPrograms.map(p => { const facultyCount = (p.director ? 1 : 0) + (p.faculty?.length ?? 0); return <article key={p.code}><button className="remove" onClick={() => toggleCompare(p.code)}>Remove</button><small>{p.city}, {p.state} · {p.code}</small><h3>{p.name}</h3><dl><dt>Positions</dt><dd>{p.positions ?? missing}</dd><dt>Listed F&amp;A faculty</dt><dd>{facultyCount}</dd><dt>Faculty-to-fellow ratio</dt><dd>{p.positions ? `${facultyCount}:${p.positions}` : missing}</dd><dt>Clinical focus</dt><dd>{p.focus?.join(" · ") ?? missing}</dd><dt>Stipend</dt><dd>{p.stipend ?? missing}</dd><dt>Case volume</dt><dd>{p.caseVolume ?? missing}</dd><dt>Research</dt><dd>{p.research ?? missing}</dd><dt>Call</dt><dd>{p.call ?? missing}</dd><dt>Eligibility / visa</dt><dd>{p.eligibility ?? missing}</dd></dl><a href={aofasUrl(p)} target="_blank" rel="noreferrer">Verify at AOFAS ↗</a></article>})}
+      </div></div></div>}
+
+      <section className="about" id="about"><span className="section-no">02</span><div><h2>A clearer starting point for fellowship research.</h2><p>This independent directory organizes the AOFAS 2026–2027 accredited program list geographically. It surfaces faculty rosters, clinical focus, research expectations, explicit case volume, compensation, call, and eligibility details when those facts are publicly listed.</p><p className="note">“Not publicly reported” is intentional: no salary, benefit, autonomy, alumni-outcome, or lifestyle claims are inferred. Not affiliated with or endorsed by AOFAS or SF Match. Program information can change; always confirm details with the program and SF Match.</p></div></section>
       <footer><div className="brand"><span>FA</span><b>Fellowship Map</b></div><p>Built as a public resource for future foot &amp; ankle surgeons.</p><a href={sourceUrl} target="_blank" rel="noreferrer">Data source: AOFAS ↗</a></footer>
     </main>
   );
