@@ -10,6 +10,15 @@ declare global {
 const regions = ["All", "Northeast", "South", "Midwest", "West", "Canada"] as const;
 const focusOptions = ["All focuses", ...Array.from(new Set(programs.flatMap(p => p.focus ?? []))).sort()] as const;
 const missing = "Not publicly reported";
+const matchTimeline = [
+  ["Aug 3, 2026", "Registration opens", "Create your SF Match account and begin the CAS application."],
+  ["Sep 2, 2026", "CAS target date", "A target—not a universal deadline. Confirm each program’s requirements."],
+  ["Dec 2026–Feb 2027", "Interview period", "Programs may interview in person, virtually, or in a hybrid format."],
+  ["Apr 6, 2027", "Rank list deadline", "Applicant and program lists are due by noon Pacific Time."],
+  ["Apr 13, 2027", "Match Day", "Results become available at 9:00 am Pacific Time."],
+  ["Apr 14, 2027", "Post-match vacancies", "Unfilled positions may be posted through SF Match."],
+  ["Aug 2028", "Training begins", "The 2028–29 orthopaedic foot and ankle fellowship year starts."],
+] as const;
 
 function Map({ items, selected, onSelect }: { items: Program[]; selected?: Program; onSelect: (p: Program) => void }) {
   const el = useRef<HTMLDivElement>(null);
@@ -81,7 +90,7 @@ export default function FellowshipExplorer() {
     <main>
       <header className="topbar">
         <a className="brand" href="#top" aria-label="Foot and Ankle Fellowship Map home"><span>FA</span><b>Fellowship Map</b></a>
-        <nav><a href="#explore">Explore programs</a><a href="#about">About</a><a className="source-link" href={sourceUrl} target="_blank" rel="noreferrer">AOFAS source ↗</a></nav>
+        <nav><a href="#explore">Explore programs</a><a href="#application-guide">Application guide</a><a href="#about">About</a><a className="source-link" href={sourceUrl} target="_blank" rel="noreferrer">AOFAS source ↗</a></nav>
       </header>
 
       <section className="hero" id="top">
@@ -141,7 +150,21 @@ export default function FellowshipExplorer() {
         {comparedPrograms.map(p => { const facultyCount = (p.director ? 1 : 0) + (p.faculty?.length ?? 0); return <article key={p.code}><button className="remove" onClick={() => toggleCompare(p.code)}>Remove</button><small>{p.city}, {p.state} · {p.code}</small><h3>{p.name}</h3><dl><dt>Positions</dt><dd>{p.positions ?? missing}</dd><dt>Listed F&amp;A faculty</dt><dd>{facultyCount}</dd><dt>Faculty-to-fellow ratio</dt><dd>{p.positions ? `${facultyCount}:${p.positions}` : missing}</dd><dt>Clinical focus</dt><dd>{p.focus?.join(" · ") ?? missing}</dd><dt>Stipend</dt><dd>{p.stipend ?? missing}{p.stipendSource && <><br/><a className="fact-source" href={p.stipendSource} target="_blank" rel="noreferrer">Official source ↗</a></>}</dd><dt>Case volume</dt><dd>{p.caseVolume ?? missing}</dd><dt>Research</dt><dd>{p.research ?? missing}</dd><dt>Call</dt><dd>{p.call ?? missing}</dd><dt>Eligibility / visa</dt><dd>{p.eligibility ?? missing}</dd></dl><a href={aofasUrl(p)} target="_blank" rel="noreferrer">Verify at AOFAS ↗</a></article>})}
       </div></div></div>}
 
-      <section className="about" id="about"><span className="section-no">02</span><div><h2>A clearer starting point for fellowship research.</h2><p>This independent directory organizes the AOFAS 2026–2027 accredited program list geographically. It surfaces faculty rosters, clinical focus, research expectations, explicit case volume, compensation, call, and eligibility details when those facts are publicly listed.</p><p className="note">“Not publicly reported” is intentional: no salary, benefit, autonomy, alumni-outcome, or lifestyle claims are inferred. Not affiliated with or endorsed by AOFAS or SF Match. Program information can change; always confirm details with the program and SF Match.</p></div></section>
+      <section className="application-guide" id="application-guide">
+        <div className="guide-heading"><span className="section-no">02</span><div><p className="guide-kicker">2027 Match · 2028–29 training year</p><h2>Application roadmap</h2><p>Official milestones for the current orthopaedic foot and ankle fellowship application cycle. Individual program deadlines and interview dates may differ.</p></div></div>
+        <div className="timeline" aria-label="Fellowship application timeline">{matchTimeline.map(([date, title, detail], index) => <article key={date}><span>{String(index + 1).padStart(2, "0")}</span><time>{date}</time><h3>{title}</h3><p>{detail}</p></article>)}</div>
+        <div className="guide-grid">
+          <article><b>Start with program fit</b><p>Compare operative experience, faculty mentorship, clinical focus, research expectations, geography, compensation, and call—not reputation alone.</p></article>
+          <article><b>Verify every deadline</b><p>The September CAS date is a target. Programs may set their own application deadlines and requirements.</p></article>
+          <article><b>Plan for interviews</b><p>Reserve flexibility from December through February. Confirm the format, location, travel expectations, and scheduling rules with each program.</p></article>
+          <article><b>Use signals thoughtfully</b><p>Applicants may signal up to 10 programs. AOFAS encourages applicants to apply and interview broadly, including beyond signaled programs.</p></article>
+          <article><b>Track primary sources</b><p>Program information changes. Recheck SF Match, AOFAS, and the program website before applying, interviewing, and ranking.</p></article>
+          <article><b>Keep a decision log</b><p>After each interview, record case mix, autonomy, culture, mentorship, research support, benefits, and your unanswered questions.</p></article>
+        </div>
+        <div className="guide-links"><a href="https://www.aofas.org/education/fellowship-match-program/fellowship-match-timetable" target="_blank" rel="noreferrer">Official AOFAS timetable ↗</a><a href="https://sfmatch.org/specialty/orthopaedics-fellowship" target="_blank" rel="noreferrer">SF Match orthopaedics portal ↗</a></div>
+      </section>
+
+      <section className="about" id="about"><span className="section-no">03</span><div><h2>A clearer starting point for fellowship research.</h2><p>This independent directory organizes the AOFAS 2026–2027 accredited program list geographically. It surfaces faculty rosters, clinical focus, research expectations, explicit case volume, compensation, call, and eligibility details when those facts are publicly listed.</p><p className="note">The program directory cohort and application timetable are different cycles. “Not publicly reported” is intentional: no salary, benefit, autonomy, alumni-outcome, or lifestyle claims are inferred. Not affiliated with or endorsed by AOFAS or SF Match. Always confirm details directly.</p></div></section>
       <footer><div className="brand"><span>FA</span><b>Fellowship Map</b></div><p>Built as a public resource for future foot &amp; ankle surgeons.</p><a href={sourceUrl} target="_blank" rel="noreferrer">Data source: AOFAS ↗</a></footer>
     </main>
   );
