@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { DM_Sans, Instrument_Serif } from "next/font/google";
+import { Roboto, Roboto_Condensed } from "next/font/google";
 import { headers } from "next/headers";
 import "./globals.css";
 
-const sans = DM_Sans({ variable: "--font-sans", subsets: ["latin"] });
-const serif = Instrument_Serif({ variable: "--font-serif", subsets: ["latin"], weight: "400" });
+const sans = Roboto({ variable: "--font-sans", subsets: ["latin"], weight: ["400", "500", "700"] });
+const serif = Roboto_Condensed({ variable: "--font-serif", subsets: ["latin"], weight: ["500", "600", "700"] });
 
 export async function generateMetadata(): Promise<Metadata> {
   const requestHeaders = await headers();
