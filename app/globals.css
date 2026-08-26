@@ -81,6 +81,8 @@ h2 { margin:0; font-family:var(--font-serif); font-weight:400; font-size:clamp(3
 .detail-grid.facts { margin-top:17px; }
 .detail-grid.facts div { grid-template-columns:90px 1fr; }
 .detail-grid.facts b { font-weight:500; }
+.fact-source { display:inline-block; margin-top:7px; color:var(--orange); font-size:10px; font-weight:700; text-decoration:none; }
+.fact-source:hover { text-decoration:underline; }
 .profile-notes { padding-top:14px; }
 .profile-notes p { font-size:11px; line-height:1.45; margin:0 0 12px; }
 .verified { display:block; color:#81918e; font-size:9px; line-height:1.4; margin-top:15px; }
